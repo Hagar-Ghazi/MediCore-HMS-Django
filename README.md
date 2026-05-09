@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/logo.png" alt="MediCore Logo" width="80" />
+<img src="artifacts/logo.png" alt="MediCore Logo" width="80" />
 
 # MediCore HMS
 ### Hospital Management System with Local AI Integration
