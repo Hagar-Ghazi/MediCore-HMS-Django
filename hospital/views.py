@@ -1,8 +1,7 @@
 """
 MediCore HMS — Views
-──────────────────────────────────────────────────────────────────────
 All views that modify data or trigger the AI pipeline are protected
-by @login_required to prevent unauthorised access and API abuse.
+by @login_required to prevent unauthorised access and API abuse
 """
 
 import logging
@@ -121,9 +120,16 @@ def doctor_list(request):
 def doctor_detail(request, pk):
     doctor       = get_object_or_404(Doctor, pk=pk)
     appointments = doctor.appointments.select_related("patient").order_by("-date_time")[:10]
+    all_appointments = doctor.appointments.all()
+    status_stats = [
+        ("Scheduled", "amber", "fa-clock",        all_appointments.filter(status="Scheduled").count()),
+        ("Completed", "green", "fa-circle-check",  all_appointments.filter(status="Completed").count()),
+        ("Canceled",  "red",   "fa-circle-xmark",  all_appointments.filter(status="Canceled").count()),
+    ]
     return render(request, "hospital/doctor_detail.html", {
         "doctor":       doctor,
         "appointments": appointments,
+        "status_stats": status_stats,
     })
 
 

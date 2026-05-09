@@ -47,17 +47,17 @@
 
   <!-- Quick stats -->
   <div style="display:flex;flex-direction:column;gap:12px;">
-    {% for s, label, color in "Scheduled,amber|Completed,green|Canceled,red"|cut:" " %}
-    {% endfor %}
+    {% for label, color, icon, count in status_stats %}
     <div class="card">
       <div class="card-body" style="display:flex;align-items:center;gap:14px;">
-        <div class="stat-icon amber" style="width:42px;height:42px;font-size:17px;border-radius:10px;"><i class="fas fa-clock"></i></div>
+        <div class="stat-icon {{ color }}" style="width:42px;height:42px;font-size:17px;border-radius:10px;"><i class="fas {{ icon }}"></i></div>
         <div>
-          <div class="stat-label">Scheduled</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;">{{ appointments|length }}</div>
+          <div class="stat-label">{{ label }}</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;">{{ count }}</div>
         </div>
       </div>
     </div>
+    {% endfor %}
   </div>
 </div>
 
