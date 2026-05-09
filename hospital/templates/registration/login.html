@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — MediCore HMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f0f2f8;
+      --surface:   #ffffff;
+      --border:    #e2e6f0;
+      --accent:    #1a56db;
+      --accent2:   #0e3fa5;
+      --accent-lt: #dce9ff;
+      --green:     #059669;
+      --green-lt:  #d1fae5;
+      --red:       #dc2626;
+      --red-lt:    #fee2e2;
+      --text:      #111827;
+      --muted:     #6b7280;
+      --radius:    14px;
+      --shadow:    0 4px 24px rgba(0,0,0,.10);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ── Split layout ── */
+    .login-wrapper {
+      display: flex;
+      width: 100%;
+      max-width: 900px;
+      min-height: 560px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* ── Left panel ── */
+    .login-hero {
+      flex: 1;
+      background: linear-gradient(135deg, #0e3fa5 0%, #1a56db 60%, #2563eb 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 40px;
+      color: #fff;
+      min-width: 320px;
+    }
+
+    .hero-brand { display: flex; align-items: center; gap: 12px; }
+    .hero-brand .icon {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,.15);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .hero-brand .name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -.5px;
+    }
+    .hero-brand .sub { font-size: 11px; opacity: .6; letter-spacing: .5px; }
+
+    .hero-body { }
+    .hero-body h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero-body p { font-size: 15px; opacity: .75; line-height: 1.7; max-width: 280px; }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      align-items: center;
+    }
+    .stat { text-align: center; }
+    .stat-val { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 500; }
+    .stat-lbl { font-size: 11px; opacity: .6; letter-spacing: .5px; text-transform: uppercase; }
+
+    /* ── Right panel (form) ── */
+    .login-form-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 56px 48px;
+      max-width: 440px;
+    }
+
+    .form-header { margin-bottom: 32px; }
+    .form-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .form-header p { color: var(--muted); font-size: 14px; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 7px;
+      letter-spacing: .3px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap i {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 11px 14px 11px 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26,86,219,.12);
+      background: #fff;
+    }
+
+    .error-list {
+      background: var(--red-lt);
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--red);
+    }
+    .error-list ul { padding-left: 16px; }
+
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .3px;
+      transition: background .2s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .btn-login:hover  { background: var(--accent2); }
+    .btn-login:active { transform: scale(.98); }
+
+    .form-footer {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .form-footer i { color: var(--green); }
+
+    @media (max-width: 680px) {
+      .login-hero { display: none; }
+      .login-form-panel { max-width: 100%; padding: 40px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+  <!-- Left hero panel -->
+  <div class="login-hero">
+    <div class="hero-brand">
+      <div class="icon"><i class="fas fa-hospital-user"></i></div>
+      <div>
+        <div class="name">MediCore</div>
+        <div class="sub">HOSPITAL MANAGEMENT SYSTEM</div>
+      </div>
+    </div>
+
+    <div class="hero-body">
+      <h1>AI-Powered Clinical Intelligence</h1>
+      <p>Real-time symptom analysis, automated diagnosis support and full hospital workflow management in one secure platform.</p>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-val">99%</div>
+        <div class="stat-lbl">Uptime</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">AI</div>
+        <div class="stat-lbl">Powered</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">🔒</div>
+        <div class="stat-lbl">Secure</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="login-form-panel">
+    <div class="form-header">
+      <h2>Welcome back</h2>
+      <p>Sign in to access the hospital dashboard</p>
+    </div>
+
+    {% if form.errors %}
+    <div class="error-list">
+      <strong>Invalid credentials.</strong> Please check your username and password.
+    </div>
+    {% endif %}
+
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_username">Username</label>
+        <div class="input-wrap">
+          <i class="fas fa-user"></i>
+          <input
+            type="text"
+            name="username"
+            id="id_username"
+            autocomplete="username"
+            placeholder="Enter your username"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_password">Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            name="password"
+            id="id_password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+      </div>
+
+      <input type="hidden" name="next" value="{{ next }}"/>
+
+      <button type="submit" class="btn-login">
+        <i class="fas fa-arrow-right-to-bracket"></i>
+        Sign In to MediCore
+      </button>
+    </form>
+
+    <div class="form-footer">
+      <i class="fas fa-shield-halved"></i>
+      Access restricted to authorised hospital staff only.
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

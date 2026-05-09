@@ -1,0 +1,101 @@
+{% extends 'hospital/base.html' %}
+{% block title %}Appointment #{{ appointment.pk }} — MediCore{% endblock %}
+{% block topbar_title %}Appointment Detail{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <a href="{% url 'appointment_list' %}" class="text-muted text-sm" style="text-decoration:none;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
+      <i class="fas fa-chevron-left" style="font-size:11px"></i> Appointments
+    </a>
+    <h1>Appointment #{{ appointment.pk }}</h1>
+    <p>{{ appointment.date_time|date:"l, d F Y · H:i" }}</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="{% url 'appointment_edit' appointment.pk %}"   class="btn btn-secondary"><i class="fas fa-pen"></i> Edit</a>
+    <a href="{% url 'appointment_delete' appointment.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
+  </div>
+</div>
+
+<div class="grid-2 mb-6">
+  <!-- Details -->
+  <div class="card">
+    <div class="card-header"><h3>Appointment Details</h3></div>
+    <div class="card-body">
+      <div class="detail-field">
+        <div class="label">Status</div>
+        <div class="value">
+          {% if appointment.status == 'Scheduled' %}<span class="badge badge-amber" style="font-size:13px;padding:5px 14px"><i class="fas fa-clock"></i> Scheduled</span>
+          {% elif appointment.status == 'Completed' %}<span class="badge badge-green" style="font-size:13px;padding:5px 14px"><i class="fas fa-check"></i> Completed</span>
+          {% else %}<span class="badge badge-red" style="font-size:13px;padding:5px 14px"><i class="fas fa-times"></i> Canceled</span>{% endif %}
+        </div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Patient</div>
+        <div class="value"><a href="{% url 'patient_detail' appointment.patient.pk %}" style="color:var(--accent);text-decoration:none;font-weight:600">{{ appointment.patient.name }}</a></div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Doctor</div>
+        <div class="value"><a href="{% url 'doctor_detail' appointment.doctor.pk %}" style="color:var(--accent);text-decoration:none;font-weight:600">Dr. {{ appointment.doctor.name }}</a></div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Department</div>
+        <div class="value">{{ appointment.doctor.department.name }}</div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Date & Time</div>
+        <div class="value">{{ appointment.date_time|date:"d F Y, H:i" }}</div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Reason</div>
+        <div class="value">{{ appointment.reason }}</div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Created</div>
+        <div class="value text-muted text-sm">{{ appointment.created_at|date:"d M Y, H:i" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Predictions -->
+  <div class="card">
+    <div class="card-header">
+      <h3><i class="fas fa-brain" style="color:var(--purple);margin-right:8px"></i>AI Predictions</h3>
+    </div>
+    <div class="card-body">
+      {% for pred in appointment.predictions.all %}
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <span class="badge {% if pred.status == 'SUCCESS' %}badge-green{% else %}badge-red{% endif %}">
+            {% if pred.status == 'SUCCESS' %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-times"></i>{% endif %} {{ pred.status }}
+          </span>
+          <span class="text-muted text-sm">{{ pred.model_version }}</span>
+        </div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:8px;color:var(--text)">{{ pred.predicted_diagnosis }}</div>
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span class="text-muted text-sm">Confidence</span>
+            <span class="text-sm font-bold">{{ pred.confidence_percent }}%</span>
+          </div>
+          <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:{{ pred.confidence_percent }}%;background:{% if pred.confidence_percent >= 80 %}var(--green){% elif pred.confidence_percent >= 60 %}var(--amber){% else %}var(--red){% endif %};border-radius:4px;"></div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span class="text-muted text-sm"><i class="fas fa-bolt" style="margin-right:4px"></i>{{ pred.latency_ms }} ms</span>
+          <span class="text-muted text-sm">{{ pred.created_at|date:"d M Y, H:i" }}</span>
+        </div>
+        {% if pred.error_message %}
+        <div style="margin-top:10px;padding:8px 12px;background:var(--red-lt);border-radius:6px;font-size:12px;color:var(--red)">{{ pred.error_message }}</div>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="empty-state" style="padding:30px 20px">
+        <i class="fas fa-brain"></i>
+        <p>No AI predictions yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

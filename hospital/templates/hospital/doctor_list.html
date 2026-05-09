@@ -1,0 +1,68 @@
+{% extends 'hospital/base.html' %}
+{% block title %}Doctors — MediCore{% endblock %}
+{% block topbar_title %}Doctors{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Doctors</h1>
+    <p>Manage medical staff across all departments</p>
+  </div>
+  <a href="{% url 'doctor_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Doctor</a>
+</div>
+
+<!-- Filters -->
+<form method="get" class="filter-bar">
+  <div class="search-wrap">
+    <i class="fas fa-search"></i>
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by name or specialty…">
+  </div>
+  <select name="dept" onchange="this.form.submit()" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);outline:none;background:var(--surface);cursor:pointer;">
+    <option value="">All Departments</option>
+    {% for dept in departments %}
+    <option value="{{ dept.pk }}" {% if dept_id == dept.pk|stringformat:"i" %}selected{% endif %}>{{ dept.name }}</option>
+    {% endfor %}
+  </select>
+  {% if q or dept_id %}
+    <a href="{% url 'doctor_list' %}" class="btn btn-secondary btn-sm"><i class="fas fa-times"></i> Clear</a>
+  {% endif %}
+</form>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Doctor</th><th>Specialty</th><th>Department</th><th>Email</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for doctor in doctors %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="doc-avatar">{{ doctor.name|slice:":1" }}</div>
+              <a href="{% url 'doctor_detail' doctor.pk %}" style="font-weight:600;text-decoration:none;color:var(--accent)">Dr. {{ doctor.name }}</a>
+            </div>
+          </td>
+          <td><span class="badge badge-purple">{{ doctor.specialty }}</span></td>
+          <td>
+            <a href="{% url 'department_detail' doctor.department.pk %}" style="color:var(--muted);text-decoration:none;font-size:13px;">
+              <i class="fas fa-building-columns" style="margin-right:4px;font-size:11px"></i>{{ doctor.department.name }}
+            </a>
+          </td>
+          <td class="text-muted">{{ doctor.email }}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-secondary btn-sm btn-icon" title="View"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'doctor_edit' doctor.pk %}"   class="btn btn-secondary btn-sm btn-icon" title="Edit"><i class="fas fa-pen"></i></a>
+              <a href="{% url 'doctor_delete' doctor.pk %}" class="btn btn-secondary btn-sm btn-icon" title="Delete" style="color:var(--red)"><i class="fas fa-trash"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty-state"><i class="fas fa-user-doctor"></i><p>No doctors found.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

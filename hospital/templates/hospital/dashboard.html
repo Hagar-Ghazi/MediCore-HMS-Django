@@ -1,0 +1,192 @@
+{% extends 'hospital/base.html' %}
+{% block title %}Dashboard — MediCore{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 id="greeting">Welcome 👋</h1>
+  <script>
+    (function() {
+      var h = new Date().getHours();
+      var msg = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+      document.getElementById("greeting").childNodes[0].nodeValue = msg + " ";
+    })();
+  </script>
+    <p>Here's what's happening at MediCore today.</p>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-bed-pulse"></i></div>
+    <div>
+      <div class="stat-label">Total Patients</div>
+      <div class="stat-value">{{ total_patients }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-user-doctor"></i></div>
+    <div>
+      <div class="stat-label">Doctors</div>
+      <div class="stat-value">{{ total_doctors }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber"><i class="fas fa-calendar-check"></i></div>
+    <div>
+      <div class="stat-label">Appointments</div>
+      <div class="stat-value">{{ total_appointments }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon purple"><i class="fas fa-building-columns"></i></div>
+    <div>
+      <div class="stat-label">Departments</div>
+      <div class="stat-value">{{ total_departments }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-brain"></i></div>
+    <div>
+      <div class="stat-label">AI Avg. Confidence</div>
+      <div class="stat-value">{{ avg_confidence }}<span style="font-size:16px;font-weight:400">%</span></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-bolt"></i></div>
+    <div>
+      <div class="stat-label">Avg. Latency</div>
+      <div class="stat-value">{{ avg_latency }}<span style="font-size:16px;font-weight:400">ms</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Appointment status row -->
+<div class="grid-3 mb-6">
+  <div class="card">
+    <div class="card-body" style="display:flex;align-items:center;gap:16px;">
+      <div class="stat-icon amber" style="width:44px;height:44px;font-size:18px;border-radius:10px;"><i class="fas fa-clock"></i></div>
+      <div>
+        <div class="stat-label">Scheduled</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:500;">{{ scheduled }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body" style="display:flex;align-items:center;gap:16px;">
+      <div class="stat-icon green" style="width:44px;height:44px;font-size:18px;border-radius:10px;"><i class="fas fa-circle-check"></i></div>
+      <div>
+        <div class="stat-label">Completed</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:500;">{{ completed }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body" style="display:flex;align-items:center;gap:16px;">
+      <div class="stat-icon red" style="width:44px;height:44px;font-size:18px;border-radius:10px;"><i class="fas fa-circle-xmark"></i></div>
+      <div>
+        <div class="stat-label">Canceled</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:20px;font-weight:500;">{{ canceled }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main grid -->
+<div class="grid-2 mb-6">
+
+  <!-- Recent Appointments -->
+  <div class="card">
+    <div class="card-header">
+      <h3><i class="fas fa-calendar-check" style="color:var(--accent);margin-right:8px"></i>Recent Appointments</h3>
+      <a href="{% url 'appointment_list' %}" class="btn btn-secondary btn-sm">View all</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Patient</th><th>Doctor</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for appt in recent_appointments %}
+          <tr>
+            <td>
+              <a href="{% url 'appointment_detail' appt.pk %}" style="color:var(--accent);font-weight:500;text-decoration:none;">
+                {{ appt.patient.name }}
+              </a>
+            </td>
+            <td class="text-muted">Dr. {{ appt.doctor.name }}</td>
+            <td>
+              {% if appt.status == 'Scheduled' %}
+                <span class="badge badge-amber">{{ appt.status }}</span>
+              {% elif appt.status == 'Completed' %}
+                <span class="badge badge-green">{{ appt.status }}</span>
+              {% else %}
+                <span class="badge badge-red">{{ appt.status }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted" style="text-align:center;padding:24px">No appointments yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AI Predictions -->
+  <div class="card">
+    <div class="card-header">
+      <h3><i class="fas fa-brain" style="color:var(--purple);margin-right:8px"></i>AI Predictions</h3>
+      <a href="{% url 'prediction_list' %}" class="btn btn-secondary btn-sm">View all</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Patient</th><th>Diagnosis</th><th>Confidence</th></tr>
+        </thead>
+        <tbody>
+          {% for pred in recent_predictions %}
+          <tr>
+            <td style="font-weight:500">{{ pred.appointment.patient.name }}</td>
+            <td class="text-muted text-sm">{{ pred.predicted_diagnosis|truncatechars:28 }}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="conf-bar">
+                  <div class="conf-fill" style="width:{{ pred.confidence_percent }}%;background:{% if pred.confidence_percent >= 80 %}var(--green){% elif pred.confidence_percent >= 60 %}var(--amber){% else %}var(--red){% endif %}"></div>
+                </div>
+                <span class="text-sm font-bold">{{ pred.confidence_percent }}%</span>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-muted" style="text-align:center;padding:24px">No predictions yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Department overview -->
+<div class="card">
+  <div class="card-header">
+    <h3><i class="fas fa-building-columns" style="color:var(--amber);margin-right:8px"></i>Departments Overview</h3>
+    <a href="{% url 'department_list' %}" class="btn btn-secondary btn-sm">View all</a>
+  </div>
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+      {% for dept in dept_stats %}
+      <a href="{% url 'department_detail' dept.pk %}" style="text-decoration:none;">
+        <div style="border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;transition:all .18s;cursor:pointer;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-lt)'" onmouseout="this.style.borderColor='var(--border)';this.style.background=''">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;color:var(--text)">{{ dept.name }}</div>
+          <div class="text-muted text-sm">{{ dept.doctor_count }} doctor{{ dept.doctor_count|pluralize }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'hospital/base.html' %}
+{% block title %}AI Predictions — MediCore{% endblock %}
+{% block topbar_title %}AI Predictions{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>AI Predictions</h1>
+    <p>Triage model results across all appointments</p>
+  </div>
+</div>
+
+<!-- Stats row -->
+<div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px;">
+  <div class="stat-card">
+    <div class="stat-icon purple"><i class="fas fa-brain"></i></div>
+    <div>
+      <div class="stat-label">Total Predictions</div>
+      <div class="stat-value">{{ total_count }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-circle-check"></i></div>
+    <div>
+      <div class="stat-label">Successful</div>
+      <div class="stat-value">{{ success_count }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-percent"></i></div>
+    <div>
+      <div class="stat-label">Avg. Confidence</div>
+      <div class="stat-value">{{ avg_confidence }}<span style="font-size:16px;font-weight:400">%</span></div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber"><i class="fas fa-bolt"></i></div>
+    <div>
+      <div class="stat-label">Avg. Latency</div>
+      <div class="stat-value">{{ avg_latency }}<span style="font-size:16px;font-weight:400">ms</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Patient</th><th>Doctor</th><th>Diagnosis</th><th>Confidence</th><th>Model</th><th>Latency</th><th>Status</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for pred in predictions %}
+        <tr>
+          <td>
+            <a href="{% url 'patient_detail' pred.appointment.patient.pk %}" style="font-weight:600;color:var(--accent);text-decoration:none">{{ pred.appointment.patient.name }}</a>
+          </td>
+          <td class="text-muted text-sm">Dr. {{ pred.appointment.doctor.name }}</td>
+          <td>
+            <div style="font-weight:600;font-size:13px;">{{ pred.predicted_diagnosis|truncatechars:32 }}</div>
+          </td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="conf-bar">
+                <div class="conf-fill" style="width:{{ pred.confidence_percent }}%;background:{% if pred.confidence_percent >= 80 %}var(--green){% elif pred.confidence_percent >= 60 %}var(--amber){% else %}var(--red){% endif %}"></div>
+              </div>
+              <span class="text-sm font-bold" style="color:{% if pred.confidence_percent >= 80 %}var(--green){% elif pred.confidence_percent >= 60 %}var(--amber){% else %}var(--red){% endif %}">{{ pred.confidence_percent }}%</span>
+            </div>
+          </td>
+          <td><code style="font-size:12px;background:var(--surface2);padding:2px 8px;border-radius:4px;border:1px solid var(--border)">{{ pred.model_version }}</code></td>
+          <td class="text-muted text-sm">{{ pred.latency_ms }} ms</td>
+          <td>
+            {% if pred.status == 'SUCCESS' %}
+              <span class="badge badge-green"><i class="fas fa-check" style="font-size:9px"></i> Success</span>
+            {% else %}
+              <span class="badge badge-red"><i class="fas fa-times" style="font-size:9px"></i> Failed</span>
+            {% endif %}
+          </td>
+          <td class="text-muted text-sm">{{ pred.created_at|date:"d M Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8"><div class="empty-state"><i class="fas fa-brain"></i><p>No predictions found.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'hospital/base.html' %}
+{% block title %}{{ department.name }} — MediCore{% endblock %}
+{% block topbar_title %}{{ department.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <a href="{% url 'department_list' %}" class="text-muted text-sm" style="text-decoration:none;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
+      <i class="fas fa-chevron-left" style="font-size:11px"></i> Departments
+    </a>
+    <h1>{{ department.name }}</h1>
+    <p>{{ department.description|default:"No description." }}</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h3><i class="fas fa-user-doctor" style="color:var(--accent);margin-right:8px"></i>Doctors in this Department</h3>
+    <span class="badge badge-blue">{{ doctors|length }} total</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Specialty</th><th>Email</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for doctor in doctors %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="doc-avatar">{{ doctor.name|slice:":1" }}</div>
+              <a href="{% url 'doctor_detail' doctor.pk %}" style="font-weight:600;text-decoration:none;color:var(--accent)">Dr. {{ doctor.name }}</a>
+            </div>
+          </td>
+          <td><span class="badge badge-purple">{{ doctor.specialty }}</span></td>
+          <td class="text-muted">{{ doctor.email }}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-secondary btn-sm btn-icon" title="View"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'doctor_edit' doctor.pk %}" class="btn btn-secondary btn-sm btn-icon" title="Edit"><i class="fas fa-pen"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4"><div class="empty-state"><i class="fas fa-user-doctor"></i><p>No doctors assigned yet.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'hospital/base.html' %}
+{% block title %}Appointments — MediCore{% endblock %}
+{% block topbar_title %}Appointments{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Appointments</h1>
+    <p>Schedule and manage patient appointments</p>
+  </div>
+  <a href="{% url 'appointment_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Schedule Appointment</a>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="search-wrap">
+    <i class="fas fa-search"></i>
+    <input type="text" name="q" value="{{ q }}" placeholder="Search patient or doctor…">
+  </div>
+  {% for val, label in status_choices %}
+  {% endfor %}
+  <select name="status" onchange="this.form.submit()" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);outline:none;background:var(--surface);cursor:pointer;">
+    <option value="">All Statuses</option>
+    <option value="Scheduled" {% if status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+    <option value="Completed" {% if status == 'Completed' %}selected{% endif %}>Completed</option>
+    <option value="Canceled"  {% if status == 'Canceled'  %}selected{% endif %}>Canceled</option>
+  </select>
+  {% if q or status %}<a href="{% url 'appointment_list' %}" class="btn btn-secondary btn-sm"><i class="fas fa-times"></i> Clear</a>{% endif %}
+</form>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Date & Time</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+        <tr>
+          <td class="text-muted text-sm">#{{ appt.pk }}</td>
+          <td>
+            <a href="{% url 'patient_detail' appt.patient.pk %}" style="font-weight:600;text-decoration:none;color:var(--accent)">{{ appt.patient.name }}</a>
+          </td>
+          <td>
+            <a href="{% url 'doctor_detail' appt.doctor.pk %}" style="font-weight:500;text-decoration:none;color:var(--text)">Dr. {{ appt.doctor.name }}</a>
+          </td>
+          <td class="text-muted text-sm">{{ appt.doctor.department.name }}</td>
+          <td class="text-muted text-sm">{{ appt.date_time|date:"d M Y, H:i" }}</td>
+          <td>
+            {% if appt.status == 'Scheduled' %}<span class="badge badge-amber"><i class="fas fa-clock" style="font-size:10px"></i> Scheduled</span>
+            {% elif appt.status == 'Completed' %}<span class="badge badge-green"><i class="fas fa-check" style="font-size:10px"></i> Completed</span>
+            {% else %}<span class="badge badge-red"><i class="fas fa-times" style="font-size:10px"></i> Canceled</span>{% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{% url 'appointment_detail' appt.pk %}" class="btn btn-secondary btn-sm btn-icon" title="View"><i class="fas fa-eye"></i></a>
+              <a href="{% url 'appointment_edit' appt.pk %}"   class="btn btn-secondary btn-sm btn-icon" title="Edit"><i class="fas fa-pen"></i></a>
+              <a href="{% url 'appointment_delete' appt.pk %}" class="btn btn-secondary btn-sm btn-icon" title="Delete" style="color:var(--red)"><i class="fas fa-trash"></i></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-state"><i class="fas fa-calendar-xmark"></i><p>No appointments found.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

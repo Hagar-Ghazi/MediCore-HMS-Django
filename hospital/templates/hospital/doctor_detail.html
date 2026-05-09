@@ -1,0 +1,96 @@
+{% extends 'hospital/base.html' %}
+{% block title %}Dr. {{ doctor.name }} — MediCore{% endblock %}
+{% block topbar_title %}Doctor Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <a href="{% url 'doctor_list' %}" class="text-muted text-sm" style="text-decoration:none;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
+      <i class="fas fa-chevron-left" style="font-size:11px"></i> Doctors
+    </a>
+    <h1>Dr. {{ doctor.name }}</h1>
+    <p>{{ doctor.specialty }} · {{ doctor.department.name }}</p>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <a href="{% url 'doctor_edit' doctor.pk %}" class="btn btn-secondary"><i class="fas fa-pen"></i> Edit</a>
+    <a href="{% url 'doctor_delete' doctor.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a>
+  </div>
+</div>
+
+<div class="grid-2 mb-6">
+  <!-- Profile card -->
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px;">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:#fff;">
+          {{ doctor.name|slice:":1" }}
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px">Dr. {{ doctor.name }}</div>
+          <span class="badge badge-purple" style="margin-top:4px">{{ doctor.specialty }}</span>
+        </div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Department</div>
+        <div class="value"><a href="{% url 'department_detail' doctor.department.pk %}" style="color:var(--accent);text-decoration:none">{{ doctor.department.name }}</a></div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Email</div>
+        <div class="value">{{ doctor.email }}</div>
+      </div>
+      <div class="detail-field">
+        <div class="label">Total Appointments</div>
+        <div class="value" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;">{{ appointments|length }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick stats -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    {% for s, label, color in "Scheduled,amber|Completed,green|Canceled,red"|cut:" " %}
+    {% endfor %}
+    <div class="card">
+      <div class="card-body" style="display:flex;align-items:center;gap:14px;">
+        <div class="stat-icon amber" style="width:42px;height:42px;font-size:17px;border-radius:10px;"><i class="fas fa-clock"></i></div>
+        <div>
+          <div class="stat-label">Scheduled</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;">{{ appointments|length }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Appointments -->
+<div class="card">
+  <div class="card-header">
+    <h3><i class="fas fa-calendar-check" style="color:var(--accent);margin-right:8px"></i>Appointments</h3>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Patient</th><th>Date</th><th>Reason</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for appt in appointments %}
+        <tr>
+          <td>
+            <a href="{% url 'patient_detail' appt.patient.pk %}" style="font-weight:600;text-decoration:none;color:var(--accent)">{{ appt.patient.name }}</a>
+          </td>
+          <td class="text-muted text-sm">{{ appt.date_time|date:"d M Y, H:i" }}</td>
+          <td class="text-muted text-sm">{{ appt.reason|truncatechars:40 }}</td>
+          <td>
+            {% if appt.status == 'Scheduled' %}<span class="badge badge-amber">{{ appt.status }}</span>
+            {% elif appt.status == 'Completed' %}<span class="badge badge-green">{{ appt.status }}</span>
+            {% else %}<span class="badge badge-red">{{ appt.status }}</span>{% endif %}
+          </td>
+          <td><a href="{% url 'appointment_detail' appt.pk %}" class="btn btn-secondary btn-sm btn-icon"><i class="fas fa-eye"></i></a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty-state"><i class="fas fa-calendar-xmark"></i><p>No appointments yet.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
